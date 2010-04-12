@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- charts/BasicColumn.mxml -->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" backgroundColor="0xfff7ed" backgroundGradientColors="[0xfff7ed, 0xfff7ed]" backgroundGradientAlphas="[1.0, 1.0]" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" >
+  <mx:Style>
+  	.chartCol
+  	{
+  		labelPosition: outside;  
+  		labelAlign: center;	  		
+  	}
+  	
+  	.legend
+  	{
+  		backgroundColor:#fff7ed;
+  		
+  	}
+  	
+  	.axisTitle
+  	{
+  		fontSize:13px;
+  		
+  	}
+  	.chartName { color: #ffffff; fontSize: 15px; paddingLeft: 10px;  }
+  	.chartDesc { color: #000000; fontSize: 11px; paddingLeft: 10px; paddingTop: 0px; }
+  	.horizitalAxis { color:#000000; }
+  	.verticalAxis {
+  		color:#dadadb;
+  		backgroundColor:#fff7ed;
+  	}
+  	
+  	.hAxisRenderer{
+  		minorTickPlacement:none;
+  		tickPlacement:none;
+  		fontWeight:bold;
+  	}
+  	
+  	.vAxisRenderer{
+  		minorTickPlacement:none;
+  		tickPlacement:none;
+  	}  	
+  </mx:Style>
+  <mx:Script><![CDATA[
+  	import utils.MyRenderer;
+  	import mx.charts.series.ColumnSeries;
+     import mx.collections.ArrayCollection;
+     import mx.charts.series.items.ColumnSeriesItem;
+     import mx.charts.ChartItem;
+     import mx.charts.chartClasses.Series;
+     import mx.charts.chartClasses.IAxis;
+     import mx.utils.ObjectUtil;
+	 import mx.rpc.events.ResultEvent;
+	 import flash.net.*;
+	import com.adobe.serialization.json.JSON;
+
+
+	 public function init():void{
+	 	//trace("adsfdsf");
+	 	httpReq.send();
+	 }
+	 
+     private function columnSeries_labelFunc(chartItem:ChartItem, series:Series):String {
+        var col:String = ColumnSeries(chartItem.element).yField;
+        return (chartItem.item[col]) + '%';
+     }
+
+
+     private function verticalAxisLabel(item:Object, prevValue:Object, axis:IAxis):String {
+        return item + '.0%';
+     }
+                 
+    /* [Bindable]
+     public var expenses:ArrayCollection = new ArrayCollection([
+        {Group:"I will not switch", "Walchovia Bank":41.5, "Bank Of America":32.6, "Chase":30.6, "Citybank":23.9, "Banking Sector":33.5},
+        {Group:"I will definitely try", "Walchovia Bank":29.8, "Bank Of America":19.6, "Chase":21.2, "Citybank":23.0, "Banking Sector":23.2},
+        {Group:"I would recommend", "Walchovia Bank":33.0, "Bank Of America":27.4, "Chase":26.7, "Citybank":23.6, "Banking Sector":29.4}
+     ]);*/
+     
+     [Bindable]
+     public var chartData:ArrayCollection;
+     
+     [Bindable]
+     public var vAxisMin:int = 0;
+     
+     [Bindable]
+     public var vAxisMax:int = 100;
+     
+     [Bindable]
+     public var vAxisStep:int = 5;
+     
+     [Bindable]
+     public var vAxisMinorStep:int = 0;
+     
+     [Bindable]
+     public var vAxisBaseAtZero:Boolean = true;
+     
+     [Bindable]
+     public var vAxisTitle:String = "";
+     
+     [Bindable]
+     public var chartGroup:String = "Group";
+     
+	 private function onJSONLoaded(event:ResultEvent):void{
+		var rawData:String = String( event.result );
+		//trace (rawData);
+		//De-serialize the object
+		var result:Object = JSON.decode(rawData);
+			
+		//var regxarr:Array =  rawData.match(/.*ChartData.*\{(.*)\}/);
+	 	vAxisMin = result.vAxisMin;
+	 	vAxisMax = result.vAxisMax;
+	 	vAxisStep = result.vAxisStep;
+	 	vAxisBaseAtZero = result.vAxisBaseAtZero;
+	 	vAxisMinorStep = result.vAxisMinorStep;
+	 	vAxisTitle = result.vAxisTitle;
+	 	chartGroup = result.chartGroup;
+	 				
+		var arr:Array = result.chartData as Array;
+		
+		//Add the Object to an Array
+		//var arr:Array = new Array();
+		//arr.push(result);
+		//trace(arr.toString());
+		
+		initColumnSchema(result.chartField);
+		chartData = new ArrayCollection(arr);
+		myChart.dataProvider = chartData;
+		myChart.invalidateSeriesStyles();	
+		
+		myChart.horizontalAxis.chartDataProvider = chartData;	
+	 }      
+	            
+     private function trim( s:String ):String
+	 {
+  		return s.replace( /^([\s|\t|\n]+)?(.*)([\s|\t|\n]+)?$/gm, "$2" );
+	 }
+	 
+     private function initColumnSchema(params:String):void{
+     	
+     	var chartSeries:Array = new Array();
+     	
+     	var tmp:ColumnSeries = new ColumnSeries();
+     	var count:int=0;
+     	//var groupName:String = "";
+     	//myChart.series = [tmp];
+     	    	
+     	var mm:Array = params.split(",");
+     	
+     	for(var i:int=0; i < mm.length; ++i)
+     	{
+     		
+     		var nn:Array = mm[i].toString().split(":");
+     		var prop:String = nn[0].toString().replace(/"/g,"");
+     		//prop = prop.replace("\"","");
+     		prop = trim(prop);
+     		
+     		//if (i == 0 ) groupName = prop;
+     		//else
+     		//{
+     			tmp = new ColumnSeries();
+	     		tmp.id = "col" + i.toString();
+	     		tmp.xField = chartGroup;
+	     		tmp.yField = prop;
+	     		tmp.displayName = prop;
+	     		tmp.styleName = "chartCol";
+	     		tmp.labelFunction = (columnSeries_labelFunc);
+	     		//tmp.dataProvider = chartData;
+	     		tmp.setStyle("itemRenderer", new ClassFactory(utils.MyRenderer));
+	     		
+	     		//myChart.series.push(tmp);	  
+	     		chartSeries.push(tmp);
+     		//}
+     		
+     	}
+     	
+     	myChart.series = chartSeries;	
+		myChart.invalidateSeriesStyles();
+		
+     }
+     
+     private function setStartLabelFunction(): void {
+     	//cs1.setStyle("labelPosition","outside");
+     	//cs2.setStyle("labelPosition","outside");
+     }
+     
+    
+  ]]></mx:Script>
+  <mx:HTTPService id="httpReq" resultFormat="text" url="chartdata.txt" result="onJSONLoaded(event)" />
+  <!--	<mx:VBox backgroundColor="#fa9f36" width="100%" height="50">
+  		<mx:Label text="ROI Metrics" styleName="chartName">  			
+  		</mx:Label>
+  		<mx:Label text="Wachovia Bank vs. Banking Sector and Competitors Q409" styleName="chartDesc" />
+  	</mx:VBox> -->
+ 	<mx:Array id="bge">
+ 		<mx:GridLines styleName="gridLine">
+ 			<mx:horizontalStroke>
+ 				<mx:Stroke color="#dadadb" weight="1" alpha="1.0"></mx:Stroke>
+ 			</mx:horizontalStroke>
+ 			
+ 		</mx:GridLines>
+ 	</mx:Array>
+     <mx:ColumnChart id="myChart" backgroundElements="{bge}" seriesFilters="[]"  showDataTips="true" width="100%" height="100%" horizontalAxisStyleNames="horizitalAxis" verticalAxisStyleNames="verticalAxis" axisTitleStyleName="axisTitle">
+        
+        <mx:horizontalAxis>
+           <mx:CategoryAxis id="hAxis"
+                dataProvider="{chartData}" 
+                categoryField="{chartGroup}"            
+           />
+        </mx:horizontalAxis>
+        <mx:verticalAxis>        	
+        	<mx:LinearAxis id="vAxis" minimum="{vAxisMin}" maximum="{vAxisMax}"  interval="{vAxisStep}" minorInterval="{vAxisMinorStep}" baseAtZero="{vAxisBaseAtZero}"  labelFunction="verticalAxisLabel" title="{vAxisTitle}" />    	        	
+        </mx:verticalAxis>
+        
+        <mx:horizontalAxisRenderers>
+            <mx:AxisRenderer 
+                    axis="{hAxis}"
+                    showLine="true" styleName="hAxisRenderer"  >
+                    
+                    <mx:axisStroke>
+                        <mx:Stroke color="#dadadb" 
+                            weight="1" 
+                            alpha="1.0"
+                            caps="none" />
+                    </mx:axisStroke>        
+            </mx:AxisRenderer>        
+        </mx:horizontalAxisRenderers>
+        <mx:verticalAxisRenderers>
+        	<mx:AxisRenderer 
+                    axis="{vAxis}"
+                    showLine="false"
+                    color="#5a5653"
+                    styleName="vAxisRenderer"
+                    titleRenderer="utils.MyTitleRenderer"
+                    verticalAxisTitleAlignment="vertical"
+                    canDropLabels="true" 
+            >        
+            	           
+            </mx:AxisRenderer>
+        </mx:verticalAxisRenderers>
+            
+        <mx:fill>
+        	<mx:SolidColor color="#fff7ed">
+        		
+        	</mx:SolidColor>
+        </mx:fill>
+        <mx:Stroke>
+        	
+        </mx:Stroke>
+       <!-- <mx:series>
+          <mx:ColumnSeries itemRenderer="utils.MyRenderer"
+           	    styleName="chartCol" 
+                xField="Group" 
+                yField="Walchovia Bank" 
+                displayName="Walchovia Bank"
+           /> 
+           <mx:ColumnSeries itemRenderer="utils.MyRenderer"
+             	styleName="chartCol"
+                xField="Group" 
+                yField="Bank Of America" 
+                displayName="Bank Of America"
+           />
+           <mx:ColumnSeries  itemRenderer="utils.MyRenderer"
+             	styleName="chartCol"
+                xField="Group" 
+                yField="Chase" 
+                displayName="Chase"
+           />
+           <mx:ColumnSeries 
+             	styleName="chartCol" itemRenderer="utils.MyRenderer"
+                xField="Group" 
+                yField="Citybank" 
+                displayName="Citybank"
+           />
+           <mx:ColumnSeries 
+             	styleName="chartCol" itemRenderer="utils.MyRenderer"
+                xField="Group" 
+                yField="Banking Sector" 
+                displayName="Banking Sector"
+           /> 
+           
+        </mx:series> -->
+     </mx:ColumnChart>
+     <mx:Legend dataProvider="{myChart}" styleName="legend" direction="horizontal"  />
+ 
+</mx:Application>

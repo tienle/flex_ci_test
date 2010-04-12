@@ -1,0 +1,16 @@
+{
+"vAxisTitle":"Top Box Score JSON",
+"vAxisMin":0,
+"vAxisMax":100,
+"vAxisStep":5,
+"vAxisMinorStep":0,
+"vAxisBaseAtZero":true,
+"chartGroup":"Group",
+"chartField":"Walchovia Bank,Bank Of America,Chase,Citybank,Banking Sector",
+"chartData":	
+	[
+        {"Group":"I will not switch", "Walchovia Bank":41.5, "Bank Of America":32.6, "Chase":30.6, "Citybank":23.9, "Banking Sector":33.5},
+        {"Group":"I will definitely try", "Walchovia Bank":29.8, "Bank Of America":19.6, "Chase":21.2, "Citybank":23.0, "Banking Sector":23.2},
+        {"Group":"I would recommend", "Walchovia Bank":33.0, "Bank Of America":27.4, "Chase":26.7, "Citybank":23.6, "Banking Sector":29.4}
+	]
+}
