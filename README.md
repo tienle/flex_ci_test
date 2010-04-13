@@ -1,6 +1,7 @@
 Continuous Integration with Flex
 ===========
 Sample for continuous integration with Flex, FlexUnit, FlexMonkey, CC.rb
+Written by *tien.le*
 
 # Stuff we need: #
 * Flex SDK 3.5+ or Flex Builder
@@ -9,6 +10,7 @@ Sample for continuous integration with Flex, FlexUnit, FlexMonkey, CC.rb
 * Ant for automating build processes
 * FlexUnit for unit testing
 * FlexMonkey for UI testing (similar to SeleniumHq)
+
  _(NOTE: To see the full sample project, please checkout http://github.com/infinity42/flex_ci_test)_ 
 
 STEPS
@@ -23,7 +25,7 @@ STEPS
 8. Add all of the FlexUnit4 swc, flexUnitTask.jar and flexTask.jar files you downloaded above to the libs directory. (for more details on using FlexUnit, please see here and here )
 9. Create an mxml file called UnitTestRunner.mxml in the src directory.
 10. Add this code to UnitTestRunner.mxml:
-
+`
   <?xml version="1.0" encoding="utf-8"?>
   <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
   xmlns:adobe="http://www.adobe.com/2009/flexUnitUIRunner"
@@ -57,10 +59,10 @@ STEPS
   </mx:Script>
   <adobe:TestRunnerBase id="uiListener" width="100%" height="100%"  />
   </mx:Application>
-
+`
 11. Create an actionscript file called MyTestSuite.as in the src/testSuite directory.
 12. Add this code to MyTestSuite.as:
-
+`
   package testSuite
   {
     import testSuite.tests.*;
@@ -112,10 +114,10 @@ STEPS
       }
     }
   }
-
+`
 15. Create an ant build file called “build.xml” and put it in the root of your project directory
 16. Add this to the ant build file. (you may need to edit the paths depending on your Flex SDK version):
-
+`
   <?xml version="1.0" encoding="UTF-8"?>
   <project name="Flex CI Sample" basedir="." default="package">
     <!-- setup a prefix for all environment variables -->
@@ -203,40 +205,45 @@ STEPS
       </zip>
     </target>
   </project>
-
+`
 17. Check all this into an git/svn repository
 18. Open terminal and head to the CruiseControl.rb directory you downloaded in step 2.
 19. Type this command but replace the “ProjectName” and url with real stuff:
-
+`
     cruise add ProjectName -u "http://url.of.the.svn.repoitory.you/just/created"
-
-      or using git repository (refer here) like: ./cruise add FlexCISample --url git://github.com/infinity42/flex_ci_test.git -s git
-
+`
+      or using git repository (refer here) like: 
+`      
+      ./cruise add FlexCISample --url git://github.com/infinity42/flex_ci_test.git -s git
+`
  
 20. Open up the following file in a text editor:
-    ~/.cruise/projects/FlexCISample/cruise_config.rb
+`
+  ~/.cruise/projects/FlexCISample/cruise_config.rb
+`
+
 21. Right below this line “Project.configure do |project|” add this:
-
+`
     project.build_command = 'ant package'
-
+`
 22. Go back to the main CruiseControl.rb directory
 23. Type this command:
-
+`
     ./cruise start
-
+`
 24. Click here http://localhost:333 (the url of your CC.rb)
 25. Done. Congrats!
 
 
 Helpful stuff:
 --------------
-[1] Continuous Integration with Flex, FlexUnit and Ant by Daniel R.
-[2] FlexMonkey Userguide
-[3] Running FlexMonkey tests from Ant  , another guide here and here
-[4] Running FlexUnit from Ant
-[5] FlexUnit Wiki
-[6] Using FlexUnit4 with Flex SDK 3 sample
-[7] CruiseControl.rb getting started
-[8] Installation of Ant on Mac OS
+- Continuous Integration with Flex, FlexUnit and Ant by Daniel R.
+- FlexMonkey Userguide
+- Running FlexMonkey tests from Ant  , another guide here and here
+- Running FlexUnit from Ant
+- FlexUnit Wiki
+- Using FlexUnit4 with Flex SDK 3 sample
+- CruiseControl.rb getting started
+- Installation of Ant on Mac OS
 
 
