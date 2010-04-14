@@ -12,13 +12,27 @@
 	<property name="report.loc" location="${output.loc}/report" />
 	<property name="dist.loc" location="${output.loc}/dist" />
 	<property name="testrunner.name" value="UnitTestRunner" />
-
+	<property name="browser.app" value="/Applications/Firefox.app/Contents/MacOS/firefox-bin" />
+	<property name="flexmonkeytest.name" value="MonkeyContactsCodeGenExampleTestModule" />
+	<property name="ENCODING" value="UTF-8"/>  
+	
 	<!-- Setup Flex and FlexUnit ant tasks -->
 	<!-- You can set this directly so mxmlc will work correctly, or set FLEX_HOME as an environment variable and use as below -->
-	<property name="FLEX_HOME" location="/Applications/Adobe Flex Builder 3/sdks/3.2.0" />
+	<property name="FLEX_HOME" location="/Applications/Adobe Flex Builder 3/sdks/3.5.0" />
 	<taskdef resource="flexTasks.tasks" classpath="${lib.loc}/flexTasks.jar" />
 	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.0.0.jar" />
-
+	
+	<path id="libraries">
+	   <fileset dir="${lib.loc}">
+	      <include name="**/*.jar"/>
+	   </fileset>
+	</path>  
+	
+	<!-- Define the Monkey launcher ant task -->
+	<taskdef name="monkey-test-launcher"
+	   classname="com.gorillalogic.flexmonkey.anttask.MonkeyTestLauncherAntTask"
+	   classpathref="libraries" />
+ 
 	<target name="clean">
 		<!-- Remove all directories created during the build process -->
 		<echo>cleaning...</echo>
@@ -44,6 +58,29 @@
 			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
 			<compiler.headless-server>true</compiler.headless-server>
 		</mxmlc>
+		<mxmlc 
+			fork="true" 
+			maxmemory="1024m"
+			actionscript-file-encoding="${ENCODING}"
+			keep-generated-actionscript="false"
+			incremental="false"
+			as3="true" 
+			debug="true"   		
+			file="${main.src.loc}/MonkeyContacts.mxml" output="${bin.loc}/MonkeyContacts.swf">
+			
+			<library-path dir="${lib.loc}" append="true">
+				<include name="*.swc" />
+			</library-path>
+
+			<compiler.include-libraries dir="${FLEX_HOME}/frameworks/libs" append="true">
+				<include name="automation.swc"/>	
+				<include name="automation_agent.swc"/>	
+				<include name="automation_dmv.swc"/>	
+			</compiler.include-libraries>
+			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+			<compiler.headless-server>true</compiler.headless-server>
+		</mxmlc>		
+		
 	</target>
 
 	<target name="test" depends="compile">
@@ -64,14 +101,66 @@
 			haltonfailure="false" 
 			verbose="true" 
 			localTrusted="true" />
+		
+		<!-- FlexMonkey Testing -->
+		<mxmlc 
+			fork="true" 
+			maxmemory="1024m"
+			file="${main.src.loc}/${flexmonkeytest.name}.mxml"
+			output="${bin.loc}/${flexmonkeytest.name}.swf"
+			actionscript-file-encoding="${ENCODING}"
+			keep-generated-actionscript="false"
+			incremental="false"
+			as3="true"
+			debug="true">
+			  
+			<load-config filename="${FLEX_HOME}/frameworks/flex-config.xml"/>
+			
+			<source-path path-element="${FLEX_HOME}/frameworks"/>
+			<source-path path-element="${main.src.loc}"/>
 
+			<compiler.library-path dir="${FLEX_HOME}/frameworks" append="true">
+                <include name="libs" />
+                <include name="../bundles/{locale}" />
+			</compiler.library-path>			
+
+			<compiler.library-path dir="${lib.loc}" append="true">
+				<include name="automation_monkey.swc" />
+			</compiler.library-path>			
+		</mxmlc>
+		
+		<html-wrapper
+	        title="FlexMonkey Testing"
+	        file="MonkeyContacts.html"
+	        height="100%"
+	        width="100%"
+	        bgcolor="#ffffff"
+	        application="MonkeyContacts"
+	        swf="MonkeyContacts"
+	        version-major="9"
+	        version-minor="0"
+	        version-revision="0"
+	        history="false"
+	        template="no-player-detection"
+	        output="${bin.loc}"/>
+ 		
+    	<!-- <monkey-test-launcher
+          timeout="0"
+          launcher="${browser.app} file:///${bin.loc}/MonkeyContacts.html?antRun=true&amp;debug=true"
+	   	  targetSwf="no.swf"
+          testModuleSwf="${flexmonkeytest.name}.swf"
+	      snapshotDir="${bin.loc}"
+          toDir="${report.loc}" 
+          haltonfailure="false" /> -->
+		<!-- End FlexMonkey Testing -->
+ 		
 		<!-- Generate readable JUnit-style reports -->
 		<junitreport todir="${report.loc}">
 			<fileset dir="${report.loc}">
 				<include name="TEST-*.xml" />
 			</fileset>
 			<report format="frames" todir="${report.loc}/html" />
-		</junitreport>
+		</junitreport>		
 	</target>
 
 	<target name="package" depends="test">

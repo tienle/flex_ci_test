@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="absolute" height="600" width="800">
+	<mx:Script>
+		<![CDATA[
+			import mx.formatters.DateBase;
+			//COMMENT 1
+			//
+			// This is a sample application that is tested by FlexMonkey. FlexMonkey requires no application source modifications to use,
+			// so this file has no FlexMonkey-related code in it. To see how the app is tested, look in the "test" package in 
+			// the src tree
+			//
+			import mx.collections.ArrayCollection;
+			import mx.binding.utils.BindingUtils;
+			[Bindable]
+			private var contacts:ArrayCollection = new ArrayCollection(); 
+			[Bindable]
+			public var input:Object = {name: "", phone: "", type: "", birthday: new Date()};
+			
+			private function init():void {
+				BindingUtils.bindProperty(this, "input", grid, "selectedItem");
+				trace("YIKESY");
+			}
+			
+			private function add():void {
+				contacts.addItemAt({name: inName.text, phone: inPhone.text, type: inType.selectedItem, birthday: inDate.selectedDate}, 0); 
+				grid.selectedIndex = 0;
+			}
+			
+			private function change():void {
+				var index:int = grid.selectedIndex; 
+				contacts.addItemAt({name: inName.text, phone: inPhone.text, type: inType.selectedItem, birthday: inDate.selectedDate}, index); 
+				deleteRow();
+				grid.selectedIndex = index				
+			}
+			
+			private function deleteRow():void {
+				contacts.removeItemAt(grid.selectedIndex)
+//another comment							
+			}
+		]]>
+	</mx:Script>
+	<mx:TitleWindow x="10" y="10" width="100%" height="100%" layout="absolute">
+		<mx:VDividedBox x="10" y="10" width="100%" height="100%">
+			<mx:VBox>				
+			<mx:Form width="100%" height="100%">
+				<mx:Text text="Monkey Contact Manager" fontSize="33"/>
+				<mx:FormItem label="Name">
+					<mx:TextInput id="inName" text="{input.name}"  />
+				</mx:FormItem>
+				<mx:FormItem label="Phone Type">
+					<mx:ComboBox 
+						openDuration = "0"
+						closeDuration = "0"
+						id="inType" dataProvider="{['Home', 'Work', 'Mobile']}"/>
+				</mx:FormItem>				
+				<mx:FormItem label="Phone">
+					<mx:TextInput id="inPhone" text="{input.phone}"/>
+				</mx:FormItem>
+				<mx:FormItem label="Birthday">
+					<mx:DateField id="inDate" selectedDate="{input.birthday}"/>
+				</mx:FormItem>
+
+			</mx:Form>
+			<mx:ControlBar>
+				<mx:Button label="Add" click="add()"/>
+				<mx:Button label="Change" click="change()" enabled="{grid.selectedIndex > -1}"/>
+				<mx:Button label="Delete" click="deleteRow()" enabled="{grid.selectedIndex > -1}"/>
+			</mx:ControlBar>
+			</mx:VBox>			
+				<mx:DataGrid id="grid" width="100%" height="100%" dataProvider="{contacts}" editable="true">
+						<mx:columns>
+							<mx:DataGridColumn width="20" editable="false"/>						
+							<mx:DataGridColumn headerText="Name" dataField="name"  itemEditor="MonkeyItemEditor"/>
+							<mx:DataGridColumn headerText="Phone Type" dataField="type" editorDataField="selectedItem">
+								<mx:itemEditor>
+									<mx:Component>
+										<mx:ComboBox dataProvider="{['Home', 'Work', 'Mobile']}"/>
+									</mx:Component>
+								</mx:itemEditor>
+							</mx:DataGridColumn>							
+							<mx:DataGridColumn headerText="Phone" dataField="phone"/>
+							<mx:DataGridColumn headerText="Birthday" dataField="birthday"/>						
+						</mx:columns>
+				</mx:DataGrid>
+				<mx:Label text="MonkeyContacts Example"/>				
+		</mx:VDividedBox>
+	</mx:TitleWindow>
+</mx:Application>
+

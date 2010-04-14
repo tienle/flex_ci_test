@@ -1,0 +1,5 @@
+<project>
+  <targetSWF url="file:///Users/pair2/Downloads/TestChart/bin-debug/MonkeyContacts.swf" width="640" height="480" commMode="targetSWFWindow" useFlashVars="false"/>
+  <flashVars/>
+  <generatedCode url="file:///Users/pair2/Downloads/TestChart/src" suitesPackageName="testSuite"/>
+</project>

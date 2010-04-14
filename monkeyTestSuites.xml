@@ -1,0 +1,7 @@
+<TopNode>
+  <TestSuite name="NewTestSuite" description="">
+    <TestCase name="NewTestCase" description="">
+      <Test name="NewTest" description="" defaultThinkTime="500"/>
+    </TestCase>
+  </TestSuite>
+</TopNode>
