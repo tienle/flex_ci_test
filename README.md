@@ -29,36 +29,37 @@ STEPS
 
 
       <?xml version="1.0" encoding="utf-8"?>
-      <mx:application xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:adobe="http://www.adobe.com/2009/flexunituirunner"
-      layout="absolute" creationcomplete="runme()">
-      <mx:script>
-      <![cdata[
-      import testsuite.mytestsuite;
-      import org.flexunit.runner.notification.runlistener;
-      import org.flexunit.listeners.cilistener;
-      import org.flexunit.listeners.uilistener;
-      import org.flexunit.runner.flexunitcore;
-      import mx.events.flexevent;
-      import mx.logging.logeventlevel;
-      import org.flexunit.internals.textlistener;
-      import org.flexunit.internals.tracelistener;
-              
-      private var core:flexunitcore;
-      public function runme():void {
+        <mx:application xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:adobe="http://www.adobe.com/2009/flexunituirunner"
+          layout="absolute" creationcomplete="runme()">
+        <mx:script>
+          <![cdata[
+          import testsuite.mytestsuite;
+          import org.flexunit.runner.notification.runlistener;
+          import org.flexunit.listeners.cilistener;
+          import org.flexunit.listeners.uilistener;
+          import org.flexunit.runner.flexunitcore;
+          import mx.events.flexevent;
+          import mx.logging.logeventlevel;
+          import org.flexunit.internals.textlistener;
+          import org.flexunit.internals.tracelistener;
+                  
+          private var core:flexunitcore;
+          public function runme():void
+          {
+              core = new flexunitcore();
 
-          core = new flexunitcore();
-          /**if you don't need graphical test results, comment out the line below and the mxml declaring the testrunnerbase. **/
-          core.addlistener(new uilistener(uilistener));
-          core.addlistener(new cilistener());
-                      
-          /**if you would like to see text output in verbose mode, umcomment either of the follow listeners **/
-          //core.addlistener( new tracelistener() ); - for as3 projects
-          //core.addlistener( textlistener.getdefaulttextlistener( logeventlevel.debug ) ); /* for flex projects */
-          core.run(testsuite.mytestsuite);
-      } 
-      ]]>
-      </mx:script>
-      <adobe:testrunnerbase id="uilistener" width="100%" height="100%"  />
+              /**if you don't need graphical test results, comment out the line below and the mxml declaring the testrunnerbase. **/
+              core.addlistener(new uilistener(uilistener));
+              core.addlistener(new cilistener());
+                          
+              /**if you would like to see text output in verbose mode, umcomment either of the follow listeners **/
+              //core.addlistener( new tracelistener() ); - for as3 projects
+              //core.addlistener( textlistener.getdefaulttextlistener( logeventlevel.debug ) ); /* for flex projects */
+              core.run(testsuite.mytestsuite);
+          } 
+          ]]>
+        </mx:script>
+        <adobe:testrunnerbase id="uilistener" width="100%" height="100%"  />
       </mx:application>
 
 
